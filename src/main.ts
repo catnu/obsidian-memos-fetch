@@ -4,14 +4,16 @@ import {
     Plugin,
     PluginSettingTab,
     Setting,
- } from "obsidian"
+} from "obsidian"
 
 interface MemosPullPluginSettings {
+    baseURL: string,
     openID: string,
     memosFolder: string,
 }
 
 const DEFAULT_SETTINGS: MemosPullPluginSettings = {
+    baseURL: "",
     openID: "",
     memosFolder: "Memos Pull",
 }
@@ -25,15 +27,15 @@ export default class MemosPullPlugin extends Plugin {
         this.addSettingTab(new MemosPullSettingTab(this.app, this))
     }
 
-    onunload() {}
+    onunload() { }
 
     async loadSettings() {
         this.settings = Object.assign({}, DEFAULT_SETTINGS, await this.loadData())
     }
 
-    async saveSettings() {}
+    async saveSettings() { }
 
-    async pull() {}
+    async pull() { }
 }
 
 class MemosPullSettingTab extends PluginSettingTab {
@@ -44,41 +46,28 @@ class MemosPullSettingTab extends PluginSettingTab {
         this.plugin = plugin
     }
 
+    displayProperty(container: HTMLElement, key: string, desc: string, prompt: string): void {
+        const attr = key as keyof typeof this.plugin.settings
+        new Setting(container)
+            .setName(key)
+            .setDesc(desc)
+            .addText((text) =>
+                text
+                    .setPlaceholder(prompt)
+                    .setValue(this.plugin.settings[attr])
+                    .onChange(async (value) => {
+                        this.plugin.settings[attr] = value
+                        await this.plugin.saveSettings()
+                    })
+            )
+    }
+
     display(): void {
         const { containerEl } = this
-
         containerEl.empty()
-
-        containerEl.createEl("h2", { text: "Settings for Memos Pull." })
-
-        new Setting(containerEl)
-            .setName("OpenID")
-            .setDesc("Find your OpenID at your Memos Settings.")
-            .addText((text) =>
-                text
-                    .setPlaceholder("Enter your OpenID")
-                    .setValue(this.plugin.settings.openID)
-                    .onChange(async (value) => {
-                        this.plugin.settings.openID = value
-                        await this.plugin.saveSettings()
-                    })
-            )
-
-        new Setting(containerEl)
-            .setName("Memos Folder")
-            .setDesc("The folder to put memos and resources.")
-            .addText((text) =>
-                text
-                    .setPlaceholder("Enter the folder name")
-                    .setValue(this.plugin.settings.memosFolder)
-                    .onChange(async (value) => {
-                        if (value === "") {
-                            new Notice("Please enter the folder name.")
-                            return
-                        }
-                        this.plugin.settings.memosFolder = value
-                        await this.plugin.saveSettings()
-                    })
-            )
+        containerEl.createEl("h2", { text: "Settings for Memos Pull" })
+        this.displayProperty(containerEl, "baseURL", "Find your baseURL at your Memos Settings", "Enter your baseURL like https://host")
+        this.displayProperty(containerEl, "openID", "Find your openID at your Memos Settings", "Enter your openID")
+        this.displayProperty(containerEl, "memosFolder", "The folder to put memos and resources.", "Enter the folder name")
     }
 }
