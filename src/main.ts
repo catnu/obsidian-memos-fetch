@@ -14,6 +14,7 @@ interface MemosFetchPluginSettings {
     openID: string,
     memosFolder: string,
     memosPrefix: string,
+    memosCallout: string,
 }
 
 const DEFAULT_SETTINGS: MemosFetchPluginSettings = {
@@ -21,6 +22,7 @@ const DEFAULT_SETTINGS: MemosFetchPluginSettings = {
     openID: "",
     memosFolder: "Memos Fetch",
     memosPrefix: "memos-",
+    memosCallout: "[!abstract]",
 }
 
 export default class MemosFetchPlugin extends Plugin {
@@ -48,7 +50,7 @@ export default class MemosFetchPlugin extends Plugin {
     }
 
     async fetchMemos() {
-        const { baseURL, openID, memosFolder, memosPrefix } = this.settings
+        const { baseURL, openID, memosFolder, memosPrefix, memosCallout } = this.settings
         if (!baseURL) {
             new Notice("Please set baseURL before fetch memos")
             return
@@ -75,12 +77,12 @@ export default class MemosFetchPlugin extends Plugin {
                     // rewrite or skip
                     const cache = this.getFrontMatterCache(filePath)
                     if (!cache || !dailyMemos.isSynced(getSyncMetaData(cache))) {
-                        await this.app.vault.adapter.write(filePath, dailyMemos.generateContent())
+                        await this.app.vault.adapter.write(filePath, dailyMemos.generateContent(memosCallout))
                         new Notice(`update ${filePath}`)
                     }
                 } else {
                     // create file
-                    await this.app.vault.create(filePath, dailyMemos.generateContent())
+                    await this.app.vault.create(filePath, dailyMemos.generateContent(memosCallout))
                     new Notice(`create ${filePath}`)
                 }
             })
@@ -142,5 +144,7 @@ class MemosFetchSettingTab extends PluginSettingTab {
         this.displayProperty(containerEl, "openID", "Find your openID at your Memos Settings", "Enter your openID")
         this.displayProperty(containerEl, "memosFolder", "The folder to put memos and resources.", "Enter the folder name", true)
         this.displayProperty(containerEl, "memosPrefix", "The prefix for every daily memos file in memosFolder.", "Enter the prefix string", true)
+        this.displayProperty(containerEl, "memosCallout", "The callout style for every memo.", "Enter the callout", true)
+        containerEl.createEl("a", { text: "see more callouts", href: "https://help.obsidian.md/Editing+and+formatting/Callouts" })
     }
 }

@@ -30,12 +30,13 @@ export default class DailyMemos {
         }
     }
 
-    generateContent(): string {
+    generateContent(callout: string): string {
         return this.getFrontMatterContent() +
             `#memos\n🕗 date:: ${this.formateDate}\n\n` +
-            this.memos.sort((a, b) => (a.createdTs || 0) - (b.createdTs || 0)).map((memo) => `# ${moment((memo.createdTs || 0) * 1000).format("HH:mm")}\n${
-                memo.rowStatus == "ARCHIVED" ? "#memos/archived\n" : ""
-            }${memo.content}`).join("\n\n")
+            this.memos.sort((a, b) => (a.createdTs || 0) - (b.createdTs || 0)).map((memo) =>
+                `> ${callout} ${moment((memo.createdTs || 0) * 1000).format("HH:mm")}\n${
+                    memo.rowStatus == "ARCHIVED" ? "> #memos/archived\n" : ""
+                }> ${memo.content?.replace(/\n/g, "\n> ")}\n> ^${memo.createdTs}`).join("\n\n")
     }
 
     getFrontMatterContent() {
