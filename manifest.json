@@ -1,11 +1,11 @@
 {
-	"id": "obsidian-memos-pull",
-	"name": "Memos Pull",
+	"id": "obsidian-memos-fetch",
+	"name": "Memos Fetch",
 	"version": "0.0.1",
 	"minAppVersion": "0.15.0",
-	"description": "This is a plugin of obsidian to pull memeos",
+	"description": "This is a plugin of obsidian to fetch memos",
 	"author": "catnu",
-	"authorUrl": "https://github.com/catnu/obsidian-memos-pull",
-	"fundingUrl": "https://github.com/catnu/obsidian-memos-pull",
+	"authorUrl": "https://github.com/catnu/obsidian-memos-fetch",
+	"fundingUrl": "https://github.com/catnu/obsidian-memos-fetch",
 	"isDesktopOnly": false
 }
