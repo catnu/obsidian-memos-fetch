@@ -72,7 +72,7 @@ export default class MemosFetchPlugin extends Plugin {
                 const year = dailyMemos.formateDate.slice(0, 4)
                 const yearFolder = `${memosFolder}/${year}`
                 await this.createFolderNoExists(yearFolder)
-                const filePath = `${yearFolder}/${memosPrefix}${dailyMemos.formateDate}.md`
+                const filePath = `${yearFolder}/${dailyMemos.getFileName(memosPrefix)}`
                 if (await this.app.vault.adapter.exists(filePath)) {
                     // rewrite or skip
                     const cache = this.getFrontMatterCache(filePath)

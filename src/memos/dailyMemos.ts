@@ -15,12 +15,14 @@ export const getSyncMetaData = function (cache: FrontMatterCache): SyncMetaData 
 }
 
 export default class DailyMemos {
+    archived: boolean;
     formateDate: string;
     maxUpdateTs: number;
     memos: Memo[];
 
-    constructor(date: string) {
+    constructor(date: string, archived = false) {
         this.formateDate = date
+        this.archived = archived
         this.memos = []
     }
 
@@ -30,13 +32,19 @@ export default class DailyMemos {
         }
     }
 
+    getFileName(prefix: string) {
+        return `${prefix}${this.formateDate}${this.archived ? '-archived' : ''}.md`
+    }
+
     generateContent(callout: string): string {
         return this.getFrontMatterContent() +
             `#memos\n🕗 date:: ${this.formateDate}\n\n` +
-            this.memos.sort((a, b) => (a.createdTs || 0) - (b.createdTs || 0)).map((memo) =>
-                `> ${callout} ${moment((memo.createdTs || 0) * 1000).format("HH:mm")}\n${
-                    memo.rowStatus == "ARCHIVED" ? "> #memos/archived\n" : ""
-                }> ${memo.content?.replace(/\n/g, "\n> ")}\n> ^${memo.createdTs}`).join("\n\n")
+            this.memos.sort((a, b) => (a.createdTs || 0) - (b.createdTs || 0)).map((memo) => {
+                const archived = memo.rowStatus == "ARCHIVED"
+                return `> ${callout} ${moment((memo.createdTs || 0) * 1000).format(archived ? "YYYY-MM-DD HH:mm" : "HH:mm")
+                    }\n${archived ? "> #memos/archived\n>\n" : ""
+                    }> ${memo.content?.replace(/\n/g, "\n> ")}\n> ^${memo.createdTs}`
+            }).join("\n\n")
     }
 
     getFrontMatterContent() {
@@ -55,12 +63,14 @@ export const featchDailyMemos = async function (access: MemosApiAccess): Promise
     const { baseURL, openID } = access
     const api = new MemosApi(baseURL, openID)
     const memos = await api.fetchMemos()
-    const daily = new Map<string, DailyMemos>()
+    const collections = new Map<string, DailyMemos>()
     memos.forEach(function (memo) {
         memo = <Memo>memo // cast to Memo, if api change modify here
-        const date = moment((memo.createdTs || 0) * 1000).format("YYYY-MM-DD")
-        if (!daily.get(date)) daily.set(date, new DailyMemos(date))
-        daily.get(date)?.memos.push(memo)
+        const archived = memo.rowStatus == "ARCHIVED"
+        // collect archived memo yearly, normal memo daily
+        const date = moment((memo.createdTs || 0) * 1000).format(archived ? "YYYY" : "YYYY-MM-DD")
+        if (!collections.get(date)) collections.set(date, new DailyMemos(date, archived))
+        collections.get(date)?.memos.push(memo)
     })
-    return Array.from(daily.values())
+    return Array.from(collections.values())
 }
