@@ -139,6 +139,7 @@ class MemosFetchSettingTab extends PluginSettingTab {
     display(): void {
         const { containerEl } = this
         containerEl.empty()
+        containerEl.createEl("h2", { text: "Settings for Memos Pull" })
 
         this.displayProperty(containerEl, "baseURL", "Find your baseURL at your Memos Settings", "Enter your baseURL like https://host")
         this.displayProperty(containerEl, "openID", "Find your openID at your Memos Settings", "Enter your openID")
