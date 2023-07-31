@@ -13,12 +13,14 @@ interface MemosFetchPluginSettings {
     baseURL: string,
     openID: string,
     memosFolder: string,
+    memosPrefix: string,
 }
 
 const DEFAULT_SETTINGS: MemosFetchPluginSettings = {
     baseURL: "",
     openID: "",
     memosFolder: "Memos Fetch",
+    memosPrefix: "memos-",
 }
 
 export default class MemosFetchPlugin extends Plugin {
@@ -46,7 +48,7 @@ export default class MemosFetchPlugin extends Plugin {
     }
 
     async fetchMemos() {
-        const { baseURL, openID, memosFolder } = this.settings
+        const { baseURL, openID, memosFolder, memosPrefix } = this.settings
         if (!baseURL) {
             new Notice("Please set baseURL before fetch memos")
             return
@@ -68,7 +70,7 @@ export default class MemosFetchPlugin extends Plugin {
                 const year = dailyMemos.formateDate.slice(0, 4)
                 const yearFolder = `${memosFolder}/${year}`
                 await this.createFolderNoExists(yearFolder)
-                const filePath = `${yearFolder}/${dailyMemos.formateDate}.md`
+                const filePath = `${yearFolder}/${memosPrefix}${dailyMemos.formateDate}.md`
                 if (await this.app.vault.adapter.exists(filePath)) {
                     // rewrite or skip
                     const cache = this.getFrontMatterCache(filePath)
@@ -139,5 +141,6 @@ class MemosFetchSettingTab extends PluginSettingTab {
         this.displayProperty(containerEl, "baseURL", "Find your baseURL at your Memos Settings", "Enter your baseURL like https://host")
         this.displayProperty(containerEl, "openID", "Find your openID at your Memos Settings", "Enter your openID")
         this.displayProperty(containerEl, "memosFolder", "The folder to put memos and resources.", "Enter the folder name", true)
+        this.displayProperty(containerEl, "memosPrefix", "The prefix for every daily memos file in memosFolder.", "Enter the prefix string", true)
     }
 }
