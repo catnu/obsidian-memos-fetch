@@ -4,7 +4,7 @@ This plugin for [Obsidian](https://obsidian.md) allow you to fetch [Memos](https
 
 ## How to use
 
-<!-- 1. run command `Memos Fetch: Sync To Remote Discard Local` -->
+1. run command `Memos Fetch: Sync To Remote Discard Local`
 
 ![image.png](https://s2.loli.net/2023/07/31/GHr8kZOfVhRcjSx.png)
 
@@ -35,7 +35,7 @@ If you are working on the plugin, you can use the following commands to build an
 - `npm i` to install dependencies
 - `npm run dev` to start compilation in watch mode.
 
-# Releasing new releases
+## Releasing new releases
 
 - Update your `manifest.json` with your new version number, such as `1.0.1`, and the minimum Obsidian version required for your latest release.
 - Update your `versions.json` file with `"new-plugin-version": "minimum-obsidian-version"` so older versions of Obsidian can download an older version of your plugin that's compatible.
